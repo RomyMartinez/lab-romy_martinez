@@ -2,8 +2,8 @@
 
 **Disciplina:** Engenharia de Backend
 **Professor:** Ronaldo Amaral
-**Aluno:** [Seu Nome Aqui]
-**Matrícula:** [Sua Matrícula Aqui]
+**Aluno:** Romy Manuel Martinez Nava
+**Matrícula:** 202311200272
 
 > **Diretriz de Execução:** Este laboratório deve ser desenvolvido e submetido **individualmente**. Realize seus commits com as respostas diretamente neste arquivo no repositório da disciplina.
 
@@ -18,9 +18,9 @@ Atualmente, a classe `Usuario` no código fonte do monolito possui 45 atributos,
 **Tarefa 1.1 - Mapeamento:** Separe o sistema em 3 Bounded Contexts principais (ex: Identidade, Pagamentos, Logística) que atuarão como microsserviços independentes. Distribua quais informações da classe "Usuário" legado devem pertencer a cada novo microsserviço.
 
 > **Sua Resposta 1.1:**
-> - **Microsserviço 1 (Nome):** [Quais dados do usuário ficam aqui?]
-> - **Microsserviço 2 (Nome):** [Quais dados do usuário ficam aqui?]
-> - **Microsserviço 3 (Nome):** [Quais dados do usuário ficam aqui?]
+> - **Microsserviço 1 (Conta):** Responsável pelo gerenciamento dos dados pessoais e autenticação do usuário, incluindo identificador, nome, e-mail e senha armazenada de forma segura.
+> - **Microsserviço 2 (Compras):** Responsável pelo gerenciamento do carrinho de compras, histórico de navegação, produtos selecionados e preferências de compra do usuário.
+> - **Microsserviço 3 (Checkout):** Responsável pela finalização das compras, incluindo endereço de entrega, forma de pagamento, token do cartão de crédito e informações necessárias para concluir o pedido.
 
 **Tarefa 1.2 - Diagrama de Arquitetura:** Crie um diagrama demonstrando a quebra do monolito nesses 3 novos microsserviços. O diagrama deve ilustrar as fronteiras dos contextos e seus respectivos bancos de dados isolados. (Utilize a sintaxe Mermaid diretamente neste Markdown ou insira o link de uma imagem gerada em ferramentas como draw.io/Lucidchart).
 
@@ -41,7 +41,36 @@ Atualmente, a classe `Usuario` no código fonte do monolito possui 45 atributos,
 
 > **Sua Resposta 1.2 (Insira seu diagrama abaixo):**
 >
-> [Insira seu código Mermaid ou link do diagrama aqui]
+
+> **Sua Resposta 1.2:**
+>
+> ```mermaid
+> flowchart TD
+>     Cliente["Cliente / App"] --> API["API Gateway"]
+>
+>     subgraph BC1["Bounded Context: Conta"]
+>         MS1["Microsserviço Conta"]
+>         DB1[("Banco de Dados Conta")]
+>         MS1 --> DB1
+>     end
+>
+>     subgraph BC2["Bounded Context: Compras"]
+>         MS2["Microsserviço Compras"]
+>         DB2[("Banco de Dados Compras")]
+>         MS2 --> DB2
+>     end
+>
+>     subgraph BC3["Bounded Context: Checkout"]
+>         MS3["Microsserviço Checkout"]
+>         DB3[("Banco de Dados Checkout")]
+>         MS3 --> DB3
+>     end
+>
+>     API --> MS1
+>     API --> MS2
+>     API --> MS3
+> ```
+
 
 ### Parte 2: O Cubo AKF e a Escalabilidade (Eixo X - Clonagem)
 Durante os testes de carga, o servidor web atingiu 100% de CPU. A equipe decidiu colocar um *Load Balancer* e subir 3 instâncias idênticas do servidor. No entanto, ao fazer isso, os clientes começaram a reclamar que os itens desapareciam misteriosamente do carrinho de compras a cada clique.
@@ -49,7 +78,7 @@ Durante os testes de carga, o servidor web atingiu 100% de CPU. A equipe decidiu
 **Tarefa:** Explique por que os itens somem do carrinho ao clonar o servidor (estado) e qual é a solução Cloud-Native (Stateless) para resolver este problema.
 
 > **Sua Resposta:**
-> [Escreva sua explicação técnica e a solução aqui]
+Porque a informação do carrinho está armazenada localmente na sessão de cada servidor. Por outro lado, a abordagem Cloud-Native permite armazenar essas informações de forma compartilhada, sem depender da memória de cada instância da aplicação.
 
 ### Parte 3: Particionamento de Dados (Eixo Z)
 O serviço de Pedidos foi extraído com sucesso do monolito, mas seu banco de dados começou a apresentar lentidão devido ao volume massivo de transações originadas de todo o Brasil.
@@ -57,4 +86,4 @@ O serviço de Pedidos foi extraído com sucesso do monolito, mas seu banco de da
 **Tarefa:** Proponha uma estratégia de *Sharding* (particionamento) para o banco de dados de Pedidos. Qual seria a sua chave de partição (Shard Key) e por quê?
 
 > **Sua Resposta:**
-> [Justifique sua estratégia de Sharding aqui]
+A estratégia que eu utilizaria o Sharding para separar os dados dos pedidos entre diferentes bancos de dados, utilizando o cliente_id como chave de partição. Os pedidos seriam distribuídos entre os bancos, assim eu evitaria que todas as transações fiquem concentradas em um único banco de dados.
